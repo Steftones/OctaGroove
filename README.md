@@ -1,6 +1,8 @@
 # Sequencer
 An ongoing project building an 8-track sequencer with an emphasis on algorithmic variation/generation of musical patterns. The program introduces the concept of "themes" which dynamically vary your musical patterns on the fly. Users can select a range of controls for adjusting probability and randomness, enabling fine-tuning of the level of unpredictability in the musical patterns. 
 
+To run the program, download the latest version of SuperCollider and run `app.scd` in the scide IDE.
+
 To create new sample kits, add a folder into `kits` with 8 subfolders named 0-7. Fill these subfolders with either `.wav` or `.aiff` files.
 
 ## Features
@@ -12,3 +14,4 @@ To create new sample kits, add a folder into `kits` with 8 subfolders named 0-7.
 - "themes" for pattern variation/generation
 - Choose and upload different kits
 - Save/edit/delete songs and patterns
+
