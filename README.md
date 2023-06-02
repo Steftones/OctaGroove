@@ -10,7 +10,7 @@ To create new sample kits, add a folder into `kits` with 8 subfolders named 0-7.
 - No latency when changing songs or patterns
 - Options to edit chosen steps in a sequence
 - Effects
-- Randomness controls
+- Randomness and probability-based controls
 - "themes" for pattern variation/generation
 - Choose and upload different kits
 - Save/edit/delete songs and patterns
