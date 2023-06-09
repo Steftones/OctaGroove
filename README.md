@@ -15,4 +15,5 @@ To create new sample kits, add a folder into `kits` with 8 subfolders named 0-7.
 - Choose and upload different kits
 - Save/edit/delete songs and patterns
 
+
 <img width="1005" alt="screenshot" src="https://github.com/Steftones/OctaGroove/assets/68643643/c33d1899-42a1-4596-b3b3-91f34e13b6c7">
