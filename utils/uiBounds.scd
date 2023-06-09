@@ -15,13 +15,11 @@
 ~box1 = ~makeContainer.value(350, 215, 10);
 ~box2 = ~makeContainer.value(700, 215, 10);
 
-StaticText(w, Rect(50, 25, 200, 30)).string_("AlgoBeats").font_(Font(size: 20));
-
 ~ui_bounds = Dictionary[
-	\tempoLabel -> Rect(170, 30, 60, 25),
-	\tempoButton1 -> Rect(235, 30, 20, 20),
-	\tempoButton2 -> Rect(255, 30, 20, 20),
-	\playStopButton -> Rect(290, 30, 30, 20),
+	\tempoLabel -> Rect(190, 30, 60, 25),
+	\tempoButton1 -> Rect(255, 30, 20, 20),
+	\tempoButton2 -> Rect(275, 30, 20, 20),
+	\playStopButton -> Rect(310, 30, 30, 20),
 	\saveAsProjectButton -> Rect(525, 30, 60, 20),
 	\saveProjectButton -> Rect(600, 30, 60, 20),
 	\deleteProjectButton -> Rect(675, 30, 60, 20),

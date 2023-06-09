@@ -1,30 +1,38 @@
-w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
+~appName = 'OctaGroove';
+~globalFont = Font("Hiragino Sans", 11);
+~titleFont = Font("Hiragino Sans", 20);
+~globalColor = Color.fromHexString("#E2E2E2");
+~stepColor1 = Color.fromHexString("#fcc010");
+~stepColor2 = Color.fromHexString("#e67e2a");
+~stepOnColor = Color.fromHexString("#1e1d1c").alpha_(0.85);
+
+w = Window.new(~appName, Rect(400, 410, 995, 400))
 .front
-.background_(Color.grey(alpha: 0.2))
+.background_(~globalColor)
 .alwaysOnTop_(true);
 
-(~folderPath ++ 'utils/uiBounds.scd').load;
-
-~theBeatToEdit = nil;
-
 ~playStopButton = Button(w, ~ui_bounds[\playStopButton])
-.states_([['■'],['►']])
+.font_(~globalFont)
+.states_([
+	['■', nil, ~globalColor],
+	['►', nil, ~globalColor]
+])
 .action_({
 	|state|
 	if (state.value == 0,
 		{
 			'Playing...'.postln;
 			~allSamplersPlaying.do({
-				|routine|
-				routine.reset;
-				routine.play;
+				|sampler|
+				sampler[\theRoutine].reset;
+				sampler[\theRoutine].play;
 			});
 		},
 		{
 			'Stopping...'.postln;
 			~allSamplersPlaying.do({
-				|routine|
-				routine.stop;
+				|sampler|
+				sampler[\theRoutine].stop;
 			});
 		}
 	);
@@ -37,7 +45,8 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	textField = TextField.new(w).value_(nameToDisplay);
 
 	saveButton = Button.new(w)
-	.states_([["Save as"]])
+	.font_(~globalFont)
+	.states_([["Save as", nil, ~globalColor]])
 	.action_({
 		var toSave = Dictionary[
 			\allEffectValues -> ~allEffectValues.deepCopy,
@@ -52,7 +61,8 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	});
 
 	exitButton = Button.new(w)
-	.states_([["Exit"]])
+	.font_(~globalFont)
+	.states_([["Exit", nil, ~globalColor]])
 	.action_({
 		nameWindow.visible_(false);
 	});
@@ -67,7 +77,11 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	.visible_(true)
 	.layout_(
 		VLayout(
-			HLayout(StaticText(w), StaticText(w).string_("Enter name"), StaticText(w)),
+			HLayout(
+				StaticText(w),
+				StaticText(w).string_("Enter name").font_(~globalFont),
+				StaticText(w)
+			),
 			textField,
 			saveButton,
 			exitButton,
@@ -77,12 +91,18 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	nameWindow;
 };
 
+~mainTitle = StaticText(w, Rect(50, 25, 200, 30))
+.string_(~appName)
+.font_(~titleFont);
+
 ~saveAsProjectButton = Button(w, ~ui_bounds[\saveAsProjectButton])
-.states_([["Save as"]])
+.font_(~globalFont)
+.states_([["Save as", nil, ~globalColor]])
 .action_({ ~createNameWindow.value() });
 
 ~loadProjectButton = Button(w, ~ui_bounds[\loadProjectButton])
-.states_([["Load"]])
+.font_(~globalFont)
+.states_([["Load", nil, ~globalColor]])
 .action_({
 	var isNoFilesCheck = ~loadFilesPopUp.item;
 	if (isNoFilesCheck !== '-', {
@@ -129,7 +149,8 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~deleteProjectButton = Button(w, ~ui_bounds[\deleteProjectButton])
-.states_([["Delete"]])
+.font_(~globalFont)
+.states_([["Delete", nil, ~globalColor]])
 .action_({
 	var filePathToDelete = ~folderPath ++ 'save/' ++ ~loadFilesPopUp.item ++ '.song';
 	File.delete(filePathToDelete);
@@ -137,7 +158,8 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~saveProjectButton = Button(w, ~ui_bounds[\saveProjectButton])
-.states_([["Save"]])
+.font_(~globalFont)
+.states_([["Save", nil, ~globalColor]])
 .action_({
 	var path, toSave, patterns;
 	path = ~folderPath ++ 'save/' ++ ~loadFilesPopUp.item ++ '.song';
@@ -163,15 +185,23 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	if (output.size < 1, {['-']}, {output});
 };
 ~loadFilesPopUp = PopUpMenu(w, ~ui_bounds[\loadFilesPopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~loadFilesFunction.value())
 .value_(0);
 
-~globalTitle = StaticText(w, ~ui_bounds[\globalTitle]).string_("SETTINGS");
-~editBoxTitle = StaticText(w, ~ui_bounds[\editBoxTitle]).string_("EDIT PATTERN");
-~editEffectsTitle = StaticText(w, ~ui_bounds[\editEffectTitle]).string_("GLOBAL EFFECTS");
+~globalTitle = StaticText(w, ~ui_bounds[\globalTitle]).string_("SETTINGS")
+.font_(~globalFont);
+~editBoxTitle = StaticText(w, ~ui_bounds[\editBoxTitle]).string_("EDIT PATTERN")
+.font_(~globalFont);
+~editEffectsTitle = StaticText(w, ~ui_bounds[\editEffectTitle]).string_("GLOBAL EFFECTS")
+.font_(~globalFont);
 
-~editEffectLabel = StaticText(w, ~ui_bounds[\editEffectLabel]).string_("Effect:");
+~editEffectLabel = StaticText(w, ~ui_bounds[\editEffectLabel]).string_("Effect:")
+.font_(~globalFont);
 ~editEffectChoose = PopUpMenu(w, ~ui_bounds[\editEffectChoose])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~allEffects.collect({ |element| element[0]})[1..~allEffects.size])
 .value_(0)
 .action_({
@@ -191,19 +221,25 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	~allEffects[~editEffectChoose.value + 1][3].set(\edit, slider.value);
 };
 ~effectsSlider1 = Slider(w, ~ui_bounds[\effectsSlider1])
+.background_(~globalColor)
+.font_(~globalFont)
 .value_(1)
 .action_({ ~effectsSliderFunc.value(~effectsSlider1, 0, \edit) });
 
 ~effectsSlider2 = Slider(w, ~ui_bounds[\effectsSlider2])
+.background_(~globalColor)
+.font_(~globalFont)
 .value_(1)
 .action_({ ~effectsSliderFunc.value(~effectsSlider2, 1, \edit2) });
 
 ~theSamplerNumbers = 8.collect({
 	|i|
-	StaticText(w, Rect(40, (~topMargin - 3) + (i * 15.5), 60, 25)).string_(i).font_(Font(size: 11));
+	StaticText(w, Rect(40, (~topMargin - 3) + (i * 15.5), 60, 25)).string_(i).font_(Font("Hiragino Sans", size: 11));
 });
 
-~tempoString = StaticText(w, ~ui_bounds[\tempoLabel]).string_(((~tempo.tempo * 60) + "bpm")).align_(\left);
+~tempoString = StaticText(w, ~ui_bounds[\tempoLabel]).string_(((~tempo.tempo * 60) + "bpm"))
+.font_(~globalFont)
+.align_(\left);
 ~tempoButtonFunction = {
 	|newTempo|
 	~tempo = TempoClock.tempo_(newTempo / 60);
@@ -211,13 +247,15 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 };
 ~tempoButtons = [
 	Button(w, ~ui_bounds[\tempoButton1])
-	.states_([["+"]])
+	.font_(~globalFont)
+	.states_([["+", nil, ~globalColor]])
 	.action_({
 		var newTempo = (~tempo.tempo * 60) + 10;
 		if (newTempo <= 300, { ~tempoButtonFunction.value(newTempo) });
 	}),
 	Button(w, ~ui_bounds[\tempoButton2])
-	.states_([["-"]])
+	.font_(~globalFont)
+	.states_([["-", nil, ~globalColor]])
 	.action_({
 		var newTempo = (~tempo.tempo * 60) - 10;
 		if (newTempo >= 10, { ~tempoButtonFunction.value(newTempo) });
@@ -292,20 +330,28 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 					}));
 				},
 				{
-					{~editBoxTitle.string_("Select step...")}.defer;
+					{~editBoxTitle.string_("Select step...").font_(~globalFont)}.defer;
 				}
 			);
 		}
 	);
 };
-~editModeWriting = StaticText(w, ~ui_bounds[\editModeLabel]).string_("Edit mode:").align_(\left);
+~editModeWriting = StaticText(w, ~ui_bounds[\editModeLabel]).string_("Edit mode:")
+.font_(~globalFont)
+.align_(\left);
 ~eidtModePopUp = PopUpMenu(w, ~ui_bounds[\editModePopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(['Pattern', 'Step'])
 .value_(0)
 .action_({ |menu| ~editModePopUpAction.value(menu) });
 
-~editKitLabel = StaticText(w, ~ui_bounds[\editKitLabel]).string_("Kit:").align_(\left);
+~editKitLabel = StaticText(w, ~ui_bounds[\editKitLabel]).string_("Kit:")
+.font_(~globalFont)
+.align_(\left);
 ~editKitPopUp = PopUpMenu(w, ~ui_bounds[\editKitPopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~allKits.keys.asArray)
 .value_(0)
 .action_({
@@ -317,8 +363,13 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 ~currentKit = ~editKitPopUp.item;
 ~changeKitFunc.value();
 
-~chooseSamplerLabel = StaticText(w, ~ui_bounds[\chooseSamplerLabel]).string_("Sampler:").align_(\left);
+~chooseSamplerLabel = StaticText(w, ~ui_bounds[\chooseSamplerLabel])
+.string_("Sampler:")
+.font_(~globalFont)
+.align_(\left);
 ~chooseSamplerPopUp = PopUpMenu(w, ~ui_bounds[\chooseSamplerPopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(Array.series(8))
 .value_(0)
 .action_({
@@ -351,10 +402,13 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~sampleChoiceControlsLabel = StaticText(w, ~ui_bounds[\sampleChoiceControlsLabel])
+.font_(~globalFont)
 .string_("Sample:")
 .align_(\left);
 
 ~mainSeqSampleChoiceControls = PopUpMenu(w, ~ui_bounds[\sampleChoiceControlsPopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~sampleChoiceControlTypes.collect({ |element| element[0] }))
 .value_(0)
 .action_({
@@ -374,8 +428,13 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	);
 });
 
-~editBaseRateLabel = StaticText(w, ~ui_bounds[\editBaseRateLabel]).string_("Rate:").align_(\left);
+~editBaseRateLabel = StaticText(w, ~ui_bounds[\editBaseRateLabel])
+.font_(~globalFont)
+.string_("Rate:")
+.align_(\left);
 ~editBaseRatePopUp = PopUpMenu(w, ~ui_bounds[\editBaseRatePopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~editBaseRateItems)
 .value_(6)
 .action_({
@@ -394,8 +453,13 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~editRateTypes = [['None', \none]] ++ ~randomnessChoiceTypesBasic;
-~editRateLabel = StaticText(w, ~ui_bounds[\editRateLabel]).string_("Rate alg:").align_(\left);
+~editRateLabel = StaticText(w, ~ui_bounds[\editRateLabel])
+.font_(~globalFont)
+.string_("Rate alg:")
+.align_(\left);
 ~editRatePopUp = PopUpMenu(w,~ui_bounds[\editRatePopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~editRateTypes.collect({ |element| element[0] }))
 .value_(0)
 .action_({
@@ -405,9 +469,16 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	~allSamplers[theSampler][\theRate][\stream] = ~editRateTypes[menu.value][1];
 });
 
-~editEffectsLabel = StaticText(w, ~ui_bounds[\editEffectsLabel]).string_("Effect:").align_(\left);
+~editEffectsLabel = StaticText(w, ~ui_bounds[\editEffectsLabel])
+.font_(~globalFont)
+.string_("Effect:")
+.align_(\left);
 ~editEffectsPopUp = PopUpMenu(w, ~ui_bounds[\editEffectsPopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~allEffects.collect({ |element| element[0]}))
+.background_(~globalColor)
+.font_(~globalFont)
 .value_(0)
 .action_({
 	|menu|
@@ -426,10 +497,12 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~editEffectsLabel1 = StaticText(w, ~ui_bounds[\editEffectsLabel1])
+.font_(~globalFont)
 .string_(~allEffects[1][4][0])
 .align_(\left);
 
 ~editEffectsLabel2 = StaticText(w, ~ui_bounds[\editEffectsLabel2])
+.font_(~globalFont)
 .string_(~allEffects[1][4][1])
 .align_(\left);
 
@@ -443,11 +516,14 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	['4:4', [0, 1, 2]],
 ];
 ~measureControlsLabel = StaticText(w, ~ui_bounds[\measureControlsLabel])
+.font_(~globalFont)
 .string_("Measure:")
 .visible_(false)
 .align_(\left);
 
 ~measureControlsPopUp = PopUpMenu(w, ~ui_bounds[\measureControlsPopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~measureControlValues.collect({ |i| i[0] }))
 .visible_(false)
 .value_(0)
@@ -460,9 +536,14 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	});
 });
 
-~editAmpLabel = StaticText(w, ~ui_bounds[\editAmpLabel]).string_("Amp:").align_(\left);
+~editAmpLabel = StaticText(w, ~ui_bounds[\editAmpLabel])
+.font_(~globalFont)
+.string_("Amp:")
+.align_(\left);
 
 ~editAmpSlider = Slider(w, ~ui_bounds[\editAmpSlider])
+.background_(~globalColor)
+.font_(~globalFont)
 .value_(1)
 .action_({
 	var theSampler = ~editMode[\sampler];
@@ -479,6 +560,8 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~editAmp = PopUpMenu(w, ~ui_bounds[\editAmp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~editRateTypes.collect({ |element| element[0] }))
 .value_(0)
 .action_({
@@ -487,11 +570,15 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 	~allSamplers[theSampler][\theAmp][\stream] = ~editRateTypes[~editAmp.value][1];
 });
 
-~editProbLabel = StaticText(w, ~ui_bounds[\editProbLabel]).string_("Prob:")
+~editProbLabel = StaticText(w, ~ui_bounds[\editProbLabel])
+.font_(~globalFont)
+.string_("Prob:")
 .align_(\left)
 .visible_(false);
 
 ~editProbSlider = Slider(w, ~ui_bounds[\editProbSlider])
+.background_(~globalColor)
+.font_(~globalFont)
 .visible_(false)
 .value_(1)
 .action_({
@@ -503,8 +590,13 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 });
 
 ~basicThemes.do({ |theme| theme[\theme].stop });
-~editThemeLabel = StaticText(w, ~ui_bounds[\editThemeLabel]).string_("Theme:").align_(\left);
+~editThemeLabel = StaticText(w, ~ui_bounds[\editThemeLabel])
+.font_(~globalFont)
+.string_("Theme:")
+.align_(\left);
 ~editThemePopUp = PopUpMenu(w, ~ui_bounds[\editThemePopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~basicThemes.collect({ |element| element[\name] }))
 .value_(0)
 .action_({
@@ -528,8 +620,8 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 			count = 0;
 		});
 		element.states_([
-			[nil, nil, if (isButtonColor == true, nil, Color.gray(gray: 0.85, alpha: 1))],
-			[nil, nil, Color.red],
+			[nil, nil, if (isButtonColor == true, ~stepColor1, ~stepColor2)],
+			[nil, nil, ~stepOnColor],
 		]);
 	});
 };
@@ -565,21 +657,28 @@ w = Window.new('AlgoBeats', Rect(400, 410, 995, 400))
 };
 
 ~currentPattern = 0;
-~editPatternLabel = StaticText(w, ~ui_bounds[\editPatternLabel]).string_("Pattern:").align_(\left);
+~editPatternLabel = StaticText(w, ~ui_bounds[\editPatternLabel])
+.font_(~globalFont)
+.string_("Pattern:")
+.align_(\left);
 ~patternChoicePopUp = PopUpMenu(w, ~ui_bounds[\patternChoicePopUp])
+.background_(~globalColor)
+.font_(~globalFont)
 .items_(~allPatterns.collect({ |item, index| index; }))
 .value_(0)
 .action_({ |item| ~patternChoiceFunc.value(item.value); });
 
 ~addPatternButton = Button(w, ~ui_bounds[\addPatternButton])
-.states_([["Add new"]])
+.font_(~globalFont)
+.states_([["Add new", nil, ~globalColor]])
 .action_({
 	~allPatterns = ~allPatterns ++ [8.collect({ \.dup(~patternLength).asStream; })];
 	~patternChoicePopUp.items_(~allPatterns.collect({ |item, index| index; }));
 });
 
 ~deletePatternButton = Button(w, ~ui_bounds[\deletePatternButton])
-.states_([["Delete"]])
+.font_(~globalFont)
+.states_([["Delete", nil, ~globalColor]])
 .action_({
 	var patternValue = ~patternChoicePopUp.value;
 	~patternChoiceFunc.value(patternValue - 1);

@@ -25,6 +25,7 @@ s.plotTree;
 
 s.waitForBoot({
 	~tempo = TempoClock.tempo_(180/60);
+	~theBeatToEdit = nil;
 
 	~editMode = Dictionary[
 		\isEditMode -> false,
@@ -42,10 +43,11 @@ s.waitForBoot({
 	];
 
 	~patternLength = 64;
-	// rename the below - sounds dumb
+	// todo: rename the below and change items
 	~editBaseRateItems = [0.1, 0.2, 0.4, 0.5, 0.6, 0.8, 1, 1.2, 2, 3, 4, 5];
 
 	~folderPath = PathName(thisProcess.nowExecutingPath).parentPath;
+	(~folderPath ++ 'utils/uiBounds.scd').load;
 	(~folderPath ++ 'utils/themes.scd').load;
 	(~folderPath ++ 'utils/effects.scd').load;
 	(~folderPath ++ 'utils/beatUtils.scd').load;
@@ -55,8 +57,8 @@ s.waitForBoot({
 		var snd, panned;
 		snd = PlayBuf.ar(buf.numChannels, buf, BufRateScale.kr(buf) * rate, t_trig, start);
 		panned = case
-			{buf.numChannels == 1} {Pan2.ar(snd, pan)}
-			{buf.numChannels == 2} {Balance2.ar(snd[0], snd[1], pan)};
+		{buf.numChannels == 1} {Pan2.ar(snd, pan)}
+		{buf.numChannels == 2} {Balance2.ar(snd[0], snd[1], pan)};
 		snd = panned * (theAmp * amp);
 		Out.ar(out, snd);
 	}).add;
@@ -189,33 +191,36 @@ s.waitForBoot({
 
 	~allSamplersPlaying = 8.collect({
 		|i|
-		Routine {
-			var theSynth = Synth(\bufferPlayer, [\amp, 0]);
-			loop {
-				~patternLength.do({
-					|step|
-					var nextBeat = ~allBeats[i][step];
-					if (nextBeat !== \, {
-						if (nextBeat[0][\prob].coin, {
-							if (nextBeat[0][\iteration].includes(~measure) == false,
-								{
-									s.bind {
-										theSynth.set(
-											\buf, ~bufFunc.value(nextBeat[0], i),
-											\amp, ~ampFunc.value(nextBeat[0], i),
-											\rate, ~rateFunc.value(nextBeat[0], i),
-											\out, ~effectFunc.value(nextBeat[0], i),
-											\t_trig, 1,
-										);
-									};
-								}
-							);
+		Dictionary[
+			\theSynth -> Synth(\bufferPlayer, [\amp, 0]),
+			\theRoutine -> Routine {
+				var theSynth = ~allSamplersPlaying[i][\theSynth];
+				loop {
+					~patternLength.do({
+						|step|
+						var nextBeat = ~allBeats[i][step];
+						if (nextBeat !== \, {
+							if (nextBeat[0][\prob].coin, {
+								if (nextBeat[0][\iteration].includes(~measure) == false,
+									{
+										s.bind {
+											theSynth.set(
+												\buf, ~bufFunc.value(nextBeat[0], i),
+												\amp, ~ampFunc.value(nextBeat[0], i),
+												\rate, ~rateFunc.value(nextBeat[0], i),
+												\out, ~effectFunc.value(nextBeat[0], i),
+												\t_trig, 1,
+											);
+										};
+									}
+								);
+							});
 						});
+						(1/8).wait;
 					});
-					(1/8).wait;
-				});
-			};
-		}.play(quant: 4);
+				};
+			}.play(quant: 4);
+		];
 	});
 
 	~allButtons = [];
@@ -224,6 +229,7 @@ s.waitForBoot({
 		~allButtons = ~allButtons ++ Array.fill(~patternLength, {
 			|j|
 			Button(w, Rect((50 + (j * 14)), i * 1.4 + (i * 14) + ~topMargin + 2, 14, 14))
+			.font_(~globalFont)
 			.enabled_(true)
 			.action_({
 				|button|

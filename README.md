@@ -1,4 +1,4 @@
-# Sequencer
+# OctaGroove
 An ongoing project building an 8-track sequencer with an emphasis on algorithmic variation/generation of musical patterns. The program introduces the concept of "themes" which dynamically vary your musical patterns on the fly. Users can select a range of controls for adjusting probability and randomness, enabling fine-tuning of the level of unpredictability in the musical patterns. 
 
 To run the program, download the latest version of SuperCollider and run `app.scd` in the scide IDE.
