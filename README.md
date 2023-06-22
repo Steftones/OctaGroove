@@ -5,6 +5,8 @@ To run the program, download the latest version of SuperCollider and run `app.sc
 
 To create new sample kits, add a folder into `kits` with 8 subfolders named 0-7. Fill these subfolders with either `.wav` or `.aiff` files.
 
+[View a YouTube demo here](https://www.youtube.com/watch?v=BsvVJFrX-JM)
+
 ## Features
 - An 8-track, 64 step sequencer
 - No latency when changing songs or patterns
